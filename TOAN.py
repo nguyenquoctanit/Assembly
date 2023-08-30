@@ -1,12 +1,10 @@
 import PySimpleGUI as sg
-from datetime import datetime
-from plyer import notification
-
+import datetime
 class Test:
-    def getPath1():
+    def getPath():
         TM = ''
         while TM=='':
-            TM = sg.PopupGetFolder(message='thongbao',title='Hãy chọn thư mục')
+            TM = sg.PopupGetFolder(message='Hãy chọn thư mục',title='Filter OK')
             if TM != '' and TM != None:
                 TM = TM.replace('\\','/') + '/'
             elif TM =='':
@@ -15,26 +13,16 @@ class Test:
                 sg.popup('Bạn đã Cancel')
                 quit()
         return TM
-    def getPath2():
-        TM = ''
-        while TM=='':
-            TM = sg.PopupGetFolder(message='thongbao',title='Hãy chọn thư mục')
-            if TM != '' and TM != None:
-                TM = TM.replace('\\','/') + '/'
-            elif TM =='':
-                sg.popup_error('Bạn chưa nhập folder')
-            else:
-                sg.popup('Bạn đã Cancel')
-                quit()
-        return TM
-
-    def time_to_string():
-        ket_qua = f'{datetime.now():%Y-%m-%d_%H-%M-%S-%f}'
-        return ket_qua
-
-    def notify(tieude, noidung):
-        notification.notify(
-        title = tieude,
-        message = noidung,
-        timeout = 10
-        )
+    def time_to_name():
+                current_time = datetime.datetime.now() 
+                name_folder = str(current_time)
+                name_folder = list(name_folder)
+                for i in range(len(name_folder)):
+                    if name_folder[i] == ':':
+                        name_folder[i] = '-'
+                    if name_folder[i] == ' ':
+                        name_folder[i] ='_'
+                    if name_folder[i] == '.':
+                        name_folder[i] ='-'
+                name_folder = ''.join(name_folder)
+                return name_folder

@@ -15,6 +15,7 @@ import traceback
 from PIL import Image
 import numpy as np
 
+
 # from levu import val
 
 # def ExecuteCommandSubprocess(command, *args, wait=False):
@@ -92,7 +93,7 @@ DARK_HEADER_COLOR = "#1B2838"
 MYBPAD = ((20, 10), (10, 10))
 
 
-mypath1 = "D:/NQDVN_RS656_A17/FILE_TRAIN_A17/file_train_c2/A17_C2_2023-05-06.pt"
+mypath1 = "best.pt"
 model1 = torch.hub.load(
     "./levu", "custom", path=mypath1, source="local", force_reload=False
 )
@@ -468,7 +469,7 @@ def make_window():
             sg.Radio("NG", "MYRADIO", font=("Helvetica", 12), default=True),
             sg.Checkbox(
                 "Image have label",
-                size=(15, 15),
+                size=(5, 5),
                 default=False,
                 font=("Helvetica", 15),
                 key="image_have_label",
@@ -512,11 +513,18 @@ def make_window():
             sg.Slider(
                 range=(1, 100),
                 orientation="h",
-                size=(48, 20),
+                size=(35, 20),
                 font=("Helvetica", 11),
                 default_value=25,
                 key="input_conf2",
-            )
+                tooltip=""
+            ),
+            sg.InputCombo(
+                (416, 512, 608, 896, 1024, 1280, 1408, 1536),
+                size=(12, 30),
+                default_value=416,
+                key="imgsz2",
+            ),
         ],
         [sg.T("3.Choose folder image", font="Any 15", text_color="orange")],
         [
@@ -658,9 +666,9 @@ def make_window():
         [
             sg.T("4.Enter image size", font="Any 15", text_color="orange"),
             sg.InputCombo(
-                (416,512, 608,768, 896, 1024, 1280, 1408, 1536),
+                (416, 512, 608, 768, 896, 1024, 1280, 1408, 1536),
                 size=(23, 30),
-                default_value=608,
+                default_value=416,
                 key="imgsz5",
             ),
         ],
@@ -750,9 +758,9 @@ def make_window():
         [
             sg.T("3.Enter image size", font="Any 17", text_color="orange"),
             sg.InputCombo(
-                (416,512, 608,768, 896, 1024, 1280, 1408, 1536),
+                (416, 512, 608, 768, 896, 1024, 1280, 1408, 1536),
                 size=(23, 30),
-                default_value=608,
+                default_value=416,
                 key="imgsz7",
             ),
         ],
@@ -884,11 +892,19 @@ def make_window():
         [
             sg.T("3.Enter image size", font="Any 17", text_color="orange"),
             sg.InputCombo(
-                (416,512, 608,768, 896, 1024, 1280, 1408, 1536),
-
+                (416, 512, 608, 768, 896, 1024, 1280, 1408, 1536),
                 size=(23, 30),
-                default_value=608,
+                default_value=416,
                 key="imgsz8",
+            ),
+        ],
+        [
+            sg.T("Enter batch", font="Any 17", text_color="orange"),
+            sg.InputCombo(
+                (4, 8, 12, 16, 20, 24, 28, 32),
+                size=(23, 30),
+                default_value=32,
+                key="batch8",
             ),
         ],
         [sg.T("4.Choose epoch", font="Any 17", text_color="orange")],
@@ -963,7 +979,7 @@ def make_window():
                 enable_events=True,
             )
         ],
-        [sg.T("9.Start auto training", font="Any 15", text_color="orange")],
+        # [sg.T("9.Start auto training", font="Any 15", text_color="orange")],
         [
             sg.Button(
                 "Start",
@@ -1144,9 +1160,7 @@ def make_window():
                 background_color="white",
             )
         ],
-        [
-            sg.Column(Step_10, size=(480, 740), pad=MYBPAD),
-        ],
+        [sg.Column(Step_10, size=(480, 740), pad=MYBPAD),],
     ]
 
     layout = [
@@ -1155,7 +1169,7 @@ def make_window():
                 [
                     [
                         sg.Tab("Page 1", layout_1, background_color=BORDER_COLOR),
-                        sg.Tab("Page 2", layout_2, background_color=BORDER_COLOR),
+                        sg.Tab("Page 2", layout_2, background_color=BORDER_COLOR,),
                         sg.Tab("Page 3", layout_3, background_color=BORDER_COLOR),
                         sg.Tab("Page 4", layout_4, background_color=BORDER_COLOR),
                     ]
@@ -1176,7 +1190,7 @@ def make_window():
     return window
 
 
-mypath1 = "D:/NQDVN_RS656_A17/FILE_TRAIN_A17/file_train_c2/A17_C2_2023-05-06.pt"
+mypath1 = "best.pt"
 model1 = torch.hub.load(
     "./levu", "custom", path=mypath1, source="local", force_reload=False
 )
@@ -1274,6 +1288,7 @@ while True:  # Event Loop
             for name_label in model1.names:
                 if len(model1.names) <= len(list_variable):
                     if name_label == list_variable[i][0]:
+
                         window[f"{model1.names[item]}_1"].update(
                             value=list_variable[i][1]
                         )
@@ -1312,7 +1327,7 @@ while True:  # Event Loop
         ):
             # mypath = values['input_weight1']
             # model1 =torch.hub.load('./levu','custom', path= mypath, source='local', force_reload =False)
-            size = 608
+            size = 416
             conf = values["input_conf1"] / 100
             mydir = values["input_image1"] + "/*.jpg"
 
@@ -1364,11 +1379,6 @@ while True:  # Event Loop
                                 elif conf1 < int(values[f"{model1.names[i1]}_Conf_1"]):
                                     table1.drop(item, axis=0, inplace=True)
                                     area_remove1.append(item)
-
-                        if values[f'{model1.names[i1]}_1'] == False:
-                            if label_name == model1.names[i1]:
-                                table1.drop(item, axis=0, inplace=True)
-                                area_remove1.append(item)
 
                 names1 = list(table1["name"])
 
@@ -1452,9 +1462,9 @@ while True:  # Event Loop
                                     values["input_save1"] + "/" + name + ".txt",
                                 )
 
-            # window['input_weight1'].update(value='')
-            # window['input_image1'].update(value='')
-            # window['input_save1'].update(value='')
+            window["input_weight1"].update(value="")
+            window["input_image1"].update(value="")
+            window["input_save1"].update(value="")
         else:
             sg.popup_error("Error")
 
@@ -1492,7 +1502,7 @@ while True:  # Event Loop
             for path in glob.glob(mydir):
                 name = path[index + 1 : -4]
                 print(name)
-                result = model(path, conf=values["input_conf2"] / 100,size=416)
+                result = model(path, conf=values["input_conf2"] / 100,size= values['imgsz2'])
                 f = open(mysave + name + ".txt", "w")
                 for detect in result.xywhn:
                     mydetects = detect.tolist()
@@ -1542,29 +1552,34 @@ while True:  # Event Loop
                     f.write(myclass3)
                     f.write("\n")
         else:
-            ftext = sg.PopupGetFile(message='Please find file classes.txt',title='This is PopupFileBrowser ',file_types=(("Classes File", "classes.txt"),("Text Files", "*.txt"),))
-            if ftext != '' and ftext != None:
-                f = open(ftext, 'r')
-                txt=''
+            ftext = sg.PopupGetFile(
+                message="Please find file classes.txt",
+                title="This is PopupFileBrowser ",
+                file_types=(("Classes File", "classes.txt"), ("Text Files", "*.txt"),),
+            )
+            if ftext != "" and ftext != None:
+                f = open(ftext, "r")
+                txt = ""
                 myclasses3 = []
                 while True:
                     # Get next line from file
                     line = f.readline()
-                    text = line.split('\n')
-                    if text[0] != '':
+                    text = line.split("\n")
+                    if text[0] != "":
                         myclasses3.append(text[0])
                     txt = txt + line
                     if not line:
                         break
-                print('myclasses3 =',myclasses3)
-                with open(os.getcwd() + '/labelImg/data/predefined_classes.txt', "w") as f:
+                print("myclasses3 =", myclasses3)
+                with open(
+                    os.getcwd() + "/labelImg/data/predefined_classes.txt", "w"
+                ) as f:
                     for myclass3 in myclasses3:
                         f.write(myclass3)
-                        f.write('\n')
-                window['input_classes3'].update(value=txt)
-                #sg.popup('Xác nhận nội dung Labels rồi bấm OK lần nữa',title='Nhắc nhở')
-            elif ftext == '':
-                sg.popup_error('Bạn chưa chọn file classes.txt',title='Lỗi')
+                        f.write("\n")
+                window["input_classes3"].update(value=txt)
+            elif ftext == "":
+                sg.popup_error("Bạn chưa chọn file classes.txt", title="Lỗi")
 
     if event == "program3":
         if values["input_classes3"] != "":
@@ -1787,13 +1802,14 @@ while True:  # Event Loop
             sg.popup_error("Error")
 
     if event == "start5":
+        # if values['input_classes5'] != '' and values['input_name5'] != '' and values['input_save5'] != '' and class_done == True and move_done == True:
         if (
-            #values["input_classes5"] != ""
-            values["input_name5"] != ""
-            #and values["input_save5"] != ""
+            values["input_classes5"] != ""
+            and values["input_name5"] != ""
+            and values["input_save5"] != ""
             and class_done == True
-            #and move_done == True
         ):
+
             # program_dir5 = os.path.join(os.getcwd()  + '/levu/' , 'train.py')
             dir_py5 = os.path.join(os.getcwd() + "/levu/", "hlvtrain.py")
             dir_data5 = os.path.join(os.getcwd() + "/levu/", "data.yaml")
@@ -1804,7 +1820,7 @@ while True:  # Event Loop
                 " --img ",
                 str(values["imgsz5"]),
                 " --batch ",
-                "32",
+                "16",
                 " --epochs ",
                 "{}".format(int(values["input_epoch5"])),
                 " --data ",
@@ -1830,8 +1846,7 @@ while True:  # Event Loop
             )
 
             shutil.copyfile(
-                os.getcwd() + "/levu/result.txt",
-                values["input_save5"] + "/" + "result.txt",
+                os.getcwd() + "/result.txt", values["input_save5"] + "/" + "result.txt"
             )
 
             window["input_classes5"].update(value="")
@@ -1994,7 +2009,7 @@ while True:  # Event Loop
                 " --img ",
                 str(values["imgsz7"]),
                 " --batch ",
-                "32",
+                "16",
                 " --epochs ",
                 "{}".format(int(values["input_epoch7"])),
                 " --data ",
@@ -2115,22 +2130,17 @@ while True:  # Event Loop
 
                 weight_before = values["input_weight8"]
 
-                if os.path.isdir(os.getcwd() + "/train"):
-                    shutil.rmtree(os.getcwd() + "/train")
-                if os.path.isdir(os.getcwd() + "/valid"):
-                    shutil.rmtree(os.getcwd() + "/valid")
-                shutil.copytree(path_input_move + "/train", os.getcwd() + "/train")
-                shutil.copytree(path_input_move + "/valid", os.getcwd() + "/valid")
-
-                # myclasses5 = []
-                # texts5 = values['input_classes7'].split('\n')
-                # for text in texts5:
-                #     myclasses5.append(text)
+                # if os.path.isdir(os.getcwd() + "/train"):
+                #     shutil.rmtree(os.getcwd() + "/train")
+                # if os.path.isdir(os.getcwd() + "/valid"):
+                #     shutil.rmtree(os.getcwd() + "/valid")
+                # shutil.copytree(path_input_move + "/train", os.getcwd() + "/train")
+                # shutil.copytree(path_input_move + "/valid", os.getcwd() + "/valid")
 
                 with open(os.getcwd() + "/levu/data.yaml", "w") as f:
-                    f.write("train: " + os.getcwd() + "/train/images")
+                    f.write("train: " + path_input_move + "/train/images")
                     f.write("\n")
-                    f.write("val: " + os.getcwd() + "/valid/images")
+                    f.write("val: " + path_input_move + "/valid/images")
                     f.write("\n")
                     f.write("nc: " + str(len(myclasses8)))
                     f.write("\n")
@@ -2222,7 +2232,7 @@ while True:  # Event Loop
                         " --img ",
                         "{}".format(int(values["imgsz8"])),
                         " --batch ",
-                        "32",
+                        "{}".format(int(values["batch8"])),
                         " --epochs ",
                         "{}".format(int(values["input_epoch8"])),
                         " --data ",
@@ -2241,7 +2251,7 @@ while True:  # Event Loop
                         " --img ",
                         "{}".format(int(values["imgsz8"])),
                         " --batch ",
-                        "32",
+                        "{}".format(int(values["batch8"])),
                         " --epochs ",
                         "{}".format(int(values["input_epoch8"])),
                         " --data ",
@@ -2396,7 +2406,7 @@ while True:  # Event Loop
 # 'ssd1351', '--width', '128', '--height', '128', '--interface', 'spi',
 # '--gpio-data-command', '20'])
 # print('a')
-# program_dir5 = os.path.join(os.getcwd()  + '/levu/' , 'train.py' + " --img 608 --batch 4 --epochs 300 --data C:/Users/AICCSX/Desktop/vu/auto_training/levu/data.yaml --cfg .levu/models/custom_yolov5s.yaml --weights '' --my_results  --cache")
+# program_dir5 = os.path.join(os.getcwd()  + '/levu/' , 'train.py' + " --img 416 --batch 4 --epochs 300 --data C:/Users/AICCSX/Desktop/vu/auto_training/levu/data.yaml --cfg .levu/models/custom_yolov5s.yaml --weights '' --my_results  --cache")
 # ExecuteCommandSubprocess('python', program_dir5)
 
 #     for myclass5 in myclasses5:
@@ -2405,6 +2415,7 @@ while True:  # Event Loop
 # window['input_classes5'].update(value='')
 
 
-# python train.py --img 608 --batch 4 --epochs 300 --data "C:\Users\AICCSX\Desktop\vu\mytrain7\data.yaml" --cfg ./models/custom_yolov5s.yaml --weights '' --name yolov5s_results  --cache
+# python train.py --img 416 --batch 4 --epochs 300 --data "C:\Users\AICCSX\Desktop\vu\mytrain7\data.yaml" --cfg ./models/custom_yolov5s.yaml --weights '' --name yolov5s_results  --cache
 # C:/Users/AICCSX/Desktop/vu/auto_training/levu/train.py
 # C:\Users\AICCSX\Desktop\vu\autob        if values['input_classes3'] != '':
+

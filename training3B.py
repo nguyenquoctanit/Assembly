@@ -452,7 +452,7 @@ def make_window():
     window = sg.Window('Huynh Le Vu', layout, margins=(0,0), background_color=BORDER_COLOR, grab_anywhere=True)
     return window
 
-mypath1 = "D:/FILE_TRAIN_A17/file_train_c4/A17_C4_06_12_2022.pt"
+mypath1 = "best.pt"
 
 model1 = torch.hub.load('./levu','custom', path= mypath1, source='local',force_reload =False)
 model2 = torch.hub.load('./levu','custom', path= mypath1, source='local',force_reload =False)
